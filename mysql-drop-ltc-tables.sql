@@ -20,6 +20,11 @@ SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.agreed_relation DROP F
 PREPARE executionstatement FROM @alterstatement;
 EXECUTE executionstatement;
 
+# Remove Foreign Key Constraint(s) for  agreed_relation.agreed_relation_status_id to agreed_relation_status.agreed_relation_status_id
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.agreed_relation DROP FOREIGN KEY fk_agreed_relation_status_agreed_relation_status_id;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
 # Remove Foreign Key Constraint(s) for agreed_relation.importer_of_record_id to importer_of_record.importer_of_record_id
 SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.agreed_relation DROP FOREIGN KEY fk_importer_of_record_importer_of_record_id;');
 PREPARE executionstatement FROM @alterstatement;
@@ -53,24 +58,64 @@ EXECUTE executionstatement;
 #   REMOVE FOREIGN KEY - Withing the tables related to Border Manifest
 #
 
-# Remove Foreign Key Constraint(s) for customs_shipment.customs_shipment_item_id to customs_shipment_item.customs_shipmnet_item_id
-SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_shipment DROP FOREIGN KEY fk_customs_shipment_item_customs_shipment_item_id;');
+# Remove Foreign Key Constraint(s) for customs_shipment_item.customs_item_id to customs_item.customs_item_id
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_shipment_item DROP FOREIGN KEY fk_customs_shipment_customs_shipment_id;');
 PREPARE executionstatement FROM @alterstatement;
 EXECUTE executionstatement;
 
-# Remove Foreign Key Constraint(s) for customs_shipment_item.customs_item_id to customs_item.customs_item_id
-SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_shipment_item DROP FOREIGN KEY fk_customs_item_customs_item_id;');
+# Remove Foreign Key Constraint(s) for customs_shipment_item.customs_shipment_id to customs_shipment.customs_shipment_id
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_shipment_item DROP FOREIGN KEY fk_customs_shipment_customs_shipment_id2;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for customs_item.customs_item_status_id to customs_item_status.customs_item_status_id
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_item DROP FOREIGN KEY fk_customs_item_status_customs_item_status_id;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for customs_shipment.consignee_id (many) that is tied to consignee.consignee_id (one)
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_shipment DROP FOREIGN KEY fk_consignee_consignee_id;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for for consignee.consignee_id (many) that is tied to address.address_id (one)
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.consignee DROP FOREIGN KEY fk_address_address_id_1;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for for customs_shipment.destination_address_id (many) that is tied to address.address_id (one)
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_shipment DROP FOREIGN KEY fk_address_address_id_2;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for for customs_shipment.destination_address_id (many) that is tied to amount.amount_id (one)
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_item DROP FOREIGN KEY fk_amount_amount_id_1;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for for customs_shipment.destination_address_id (many) that is tied to amount.amount_id (one)
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_item DROP FOREIGN KEY fk_amount_amount_id_2;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for for customs_shipment.destination_address_id (many) that is tied to amount.amount_id (one)
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_item DROP FOREIGN KEY fk_amount_amount_id_3;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for for customs_shipment_item.destination_address_id (many) that is tied to amount.amount_id (one)
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_shipment_item DROP FOREIGN KEY fk_amount_amount_id_4;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for for amount.currency_id (many) that is tied to currency.currency_id (one)
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.amount DROP FOREIGN KEY fk_currency_currency_id;');
 PREPARE executionstatement FROM @alterstatement;
 EXECUTE executionstatement;
 
 #
 #   REMOVE FOREIGN KEY - Withing the tables related to Border Manifest
 #
-
-# Remove Foreign Key Constraint(s) for material_detail.supplier_id to supplier.supplier_id
-SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.material_detail DROP FOREIGN KEY fk_supplier_supplier_id_1;');
-PREPARE executionstatement FROM @alterstatement;
-EXECUTE executionstatement;
 
 # Remove Foreign Key Constraint(s) for material_detail_default.supplier_id to supplier.supplier_id
 SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.material_detail_default DROP FOREIGN KEY fk_supplier_supplier_id_2;');
@@ -101,6 +146,15 @@ PREPARE executionstatement FROM @alterstatement;
 EXECUTE executionstatement;
 
 #
+#   REMOVE FOREIGN KEY - Between the tables related to Suppliers and TCI
+#
+
+# Remove Foreign Key Constraint(s) for customs_shipment_item.supplier_id to supplier.supplier_id
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.customs_shipment_item DROP FOREIGN KEY fk_supplier_supplier_id2;');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+#
 #   DROP TABLES - Fulfiller Relationship related tables
 # 
 
@@ -111,6 +165,11 @@ EXECUTE executionstatement;
 
 # DROP TABLE agreed_relation;
 SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.agreed_relation');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# DROP TABLE agreed_relation_status;
+SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.agreed_relation_status');
 PREPARE executionstatement FROM @alterstatement;
 EXECUTE executionstatement;
 
@@ -147,25 +206,6 @@ EXECUTE executionstatement;
 #   DROP TABLES - Border Manifest related tables 
 # 
 
-# DROP TABLE material_detail;
-SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.material_detail');
-PREPARE executionstatement FROM @alterstatement;
-EXECUTE executionstatement;
-
-# DROP TABLE material_detail_default;
-SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.material_detail_default');
-PREPARE executionstatement FROM @alterstatement;
-EXECUTE executionstatement;
-
-# DROP TABLE supplier;
-SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.supplier');
-PREPARE executionstatement FROM @alterstatement;
-EXECUTE executionstatement;
-
-#
-#   DROP TABLES - Supplier related tables 
-# 
-
 # DROP TABLE customs_item;
 SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.customs_item');
 PREPARE executionstatement FROM @alterstatement;
@@ -178,6 +218,50 @@ EXECUTE executionstatement;
 
 # DROP TABLE customs_shipment_item;
 SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.customs_shipment_item');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# DROP TABLE customs_item_status;
+SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.customs_item_status');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# DROP TABLE consignee;
+SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.consignee');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# DROP TABLE address;
+SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.address');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# DROP TABLE amount;
+SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.amount');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# DROP TABLE currency;
+SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.currency');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+#
+#   DROP TABLES - Supplier related tables 
+# 
+
+# DROP TABLE material_detail_default;
+SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.material_detail_default');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# DROP TABLE supplier;
+SET @alterstatement=CONCAT('DROP TABLE IF EXISTS ',@SourceDBName,'.supplier');
+PREPARE executionstatement FROM @alterstatement;
+EXECUTE executionstatement;
+
+# Remove Foreign Key Constraint(s) for for importer_of_record.legal_address_id (many) that is tied to address.address_id (one)
+SET @alterstatement=CONCAT('ALTER TABLE ',@SourceDBName,'.importer_of_record DROP FOREIGN KEY fk_address_address_id_3;');
 PREPARE executionstatement FROM @alterstatement;
 EXECUTE executionstatement;
 
